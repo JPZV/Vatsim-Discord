@@ -62,3 +62,4 @@ local.properties
 #Vatsim-Discord
 config.properties
 output/Vatsim-Discord.jar
+output/*.zip
