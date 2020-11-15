@@ -4,17 +4,15 @@ import ml.jordie.vatsimnotify.storage.ConfigFile;
 import ml.jordie.vatsimnotify.vatsim.ControllerManager;
 import ml.jordie.vatsimnotify.vatsim.Parser;
 import ml.jordie.vatsimnotify.vatsim.model.Controller;
-import net.dv8tion.jda.core.AccountType;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.JDABuilder;
-import net.dv8tion.jda.core.entities.Game;
-import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.TextChannel;
 
 import javax.security.auth.login.LoginException;
 import java.awt.*;
 import java.util.*;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class Bot {
@@ -53,8 +51,7 @@ public class Bot {
                 filteredCallsign.addAll(Arrays.asList(splitPositions));
             }
 
-            api = new JDABuilder(AccountType.BOT).setToken(ConfigFile.getInstance().getProperty("DISCORD_TOKEN")).build().awaitReady();
-            api.getPresence().setGame(Game.watching("for new controllers!"));
+            api = JDABuilder.createDefault(ConfigFile.getInstance().getProperty("DISCORD_TOKEN")).setActivity(Activity.watching("for new controllers!")).build();
 
             api.setAutoReconnect(true);
 
