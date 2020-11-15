@@ -1,6 +1,9 @@
 package ml.jordie.vatsimnotify;
 
-import ml.jordie.vatsimnotify.storage.ConfigFile;
+import ml.jordie.vatsimnotify.storage.NeoConfigFile;
+import ml.jordie.vatsimnotify.vatsim.model.NotifyConfig;
+import ml.jordie.vatsimnotify.vatsim.model.GlobalConfig;
+
 import ml.jordie.vatsimnotify.vatsim.ControllerManager;
 import ml.jordie.vatsimnotify.vatsim.Parser;
 import ml.jordie.vatsimnotify.vatsim.model.Controller;
@@ -11,9 +14,8 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.TextChannel;
 
 import javax.security.auth.login.LoginException;
-import java.awt.*;
+import java.awt.Color;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class Bot {
 
@@ -21,8 +23,6 @@ public class Bot {
     public static Bot instance;
     // This is used to calculate time between start, and current (preventing spam from "newController" Alerts).
     public long startTime;
-    // List of beginning of callsigns (ie MEM, JFK, EWR, if a callsign begins with an entry in this list and filtering is enabled, it will send a message).
-    ArrayList<String> filteredCallsign = null;
 
     /**
      * @description Application entry method.
@@ -43,15 +43,8 @@ public class Bot {
     private void runBot() {
         try {
             instance = this;
-            new ConfigFile();
 
-            if (ConfigFile.getInstance().getProperty("FILTER_POSITIONS").equalsIgnoreCase("yes")) {
-                filteredCallsign = new ArrayList<>();
-                String[] splitPositions = ConfigFile.getInstance().getProperty("POSITIONS").split(",");
-                filteredCallsign.addAll(Arrays.asList(splitPositions));
-            }
-
-            api = JDABuilder.createDefault(ConfigFile.getInstance().getProperty("DISCORD_TOKEN")).setActivity(Activity.watching("for new controllers!")).build();
+            api = JDABuilder.createDefault(NeoConfigFile.getConfig().getDiscordToken()).setActivity(Activity.watching("for new controllers!")).build();
 
             api.setAutoReconnect(true);
 
@@ -92,46 +85,97 @@ public class Bot {
 
     /**
      * @description Method used to send login notifications. This will also filter out callsigns if that is enabled.
-     * @param c Controller that has gone online/offline.
+     * @param controller Controller that has gone online/offline.
      * @param offlineNotification boolean used to indicate wether this is an online controller, or offline controller notification (t = online|f = offline).
      */
-    public void newControllerAlert(Controller c, boolean offlineNotification) {
-        if (System.currentTimeMillis() - startTime > 10000) {
-            if (filteredCallsign != null) {
-                for (String s : filteredCallsign)
-                    if (c.getCallsign().startsWith(s))
-                        if(offlineNotification)
-                            sendLogoutNotification(c);
-                        else
-                            sendNotification(c);
-            } else
-                if(offlineNotification)
-                    sendLogoutNotification(c);
-                else
-                    sendNotification(c);
+    public void newControllerAlert(Controller controller, boolean offlineNotification) {
+        if (System.currentTimeMillis() - startTime > 10000)
+        {
+        	GlobalConfig globalConfig = NeoConfigFile.getConfig(); 
+        	
+        	if (globalConfig.getZones() == null)
+        		return;
+        	for (NotifyConfig config : globalConfig.getZones())
+        	{
+        		if (config.getNotifyAll())
+            	{
+            		if(offlineNotification)
+                        sendLogoutNotification(controller, config);
+                    else
+                        sendNotification(controller, config);
+            		continue;
+            	}
+        		
+        		if (config.getPositions() != null)
+        		{
+            		Boolean found = false;
+	        		for (String pos : config.getPositions())
+	        		{
+	                    if (controller.getCallsign().startsWith(pos))
+	                    {
+	                        if(offlineNotification)
+	                            sendLogoutNotification(controller, config);
+	                        else
+	                            sendNotification(controller, config);
+	                        
+	                        found = true;
+	                        break;
+	                    }
+	        		}
+	        		if (found)
+	        			continue;
+        		}
+        		
+        		if (offlineNotification && config.getNotifyClose() && config.getClosingPositions() != null)
+        		{
+        			for (String pos : config.getClosingPositions())
+            		{
+                        if (controller.getCallsign().startsWith(pos))
+                        {
+                            sendLogoutNotification(controller, config);
+                            break;
+                        }
+            		}
+        		}
+        		if (!offlineNotification && config.getOpeningPositions() != null)
+        		{
+        			for (String pos : config.getOpeningPositions())
+            		{
+                        if (controller.getCallsign().startsWith(pos))
+                        {
+                        	sendNotification(controller, config);
+                            break;
+                        }
+            		}
+        		}
+        	}
         }
     }
 
     /**
      * @description Send an online controller notification to the designated channel.
-     * @param c Controler who has gone online.
+     * @param c Controller who has gone online.
+     * @param config Config for specific zone.
      */
-    private void sendNotification(Controller c) {
-        try {
-            TextChannel notifyChannel = api.getTextChannelById(ConfigFile.getInstance().getProperty("TEXT_CHANNEL"));
-            if (notifyChannel != null) {
+    private void sendNotification(Controller c, NotifyConfig config) {
+        try 
+        {
+            TextChannel notifyChannel = api.getTextChannelById(getStringOrDefault(config.getChannelID(), NeoConfigFile.getConfig().getChannelID()));
+            if (notifyChannel != null)
+            {
                 EmbedBuilder eb = new EmbedBuilder();
                 eb.setTitle("" + c.getCallsign());
-                eb.setDescription(ConfigFile.getInstance().getProperty("POSITION_OPEN_NOTIFICATION")
+                eb.setDescription(getStringOrDefault(config.getOpeningText(), NeoConfigFile.getConfig().getOpeningText())
                         .replace("%name%", c.getRealName())
                         .replace("%position%", c.getCallsign())
                         .replace("%frequency%", c.getFrequency()));
-                eb.setFooter("VATSIM Notify", api.getSelfUser().getEffectiveAvatarUrl());
+                eb.setFooter("VATSIM", api.getSelfUser().getEffectiveAvatarUrl());
                 eb.setColor(Color.GREEN);
-                notifyChannel.sendMessage(eb.build()).queue();
-                notifyChannel.sendMessage("@here").complete().delete().queueAfter(5, TimeUnit.MINUTES);
+                notifyChannel.sendMessage(getStringOrDefault(config.getMentionID(), NeoConfigFile.getConfig().getMentionID())).embed(eb.build()).queue();
             }
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             ex.printStackTrace();
             System.exit(-1);
         }
@@ -140,27 +184,45 @@ public class Bot {
     /**
      * @description Send an offline controller notification to the designated channel.
      * @param c Controller who has gone offline.
+     * @param config Config for specific zone.
      */
-    private void sendLogoutNotification(Controller c){
-        try {
-            TextChannel notifyChannel = api.getTextChannelById(ConfigFile.getInstance().getProperty("TEXT_CHANNEL"));
-            if (ConfigFile.getInstance().getProperty("CLOSING_NOTIFICATIONS").equalsIgnoreCase("yes")) {
+    private void sendLogoutNotification(Controller c, NotifyConfig config){
+        try
+        {
+        	if (!config.getNotifyClose())
+        		return;
+        	
+            TextChannel notifyChannel = api.getTextChannelById(getStringOrDefault(config.getChannelID(), NeoConfigFile.getConfig().getChannelID()));
+            if (notifyChannel != null)
+            {
                 EmbedBuilder eb = new EmbedBuilder();
                 eb.setTitle("" + c.getCallsign());
-                eb.setDescription(ConfigFile.getInstance().getProperty("POSITION_CLOSED_NOTIFICATION")
+                eb.setDescription(getStringOrDefault(config.getClosingText(), NeoConfigFile.getConfig().getClosingText())
                         .replace("%name%", c.getRealName())
                         .replace("%position%", c.getCallsign())
                         .replace("%frequency%", c.getFrequency()));
-                eb.setFooter("VATSIM Notify", api.getSelfUser().getEffectiveAvatarUrl());
+                eb.setFooter("VATSIM", api.getSelfUser().getEffectiveAvatarUrl());
                 eb.setColor(Color.RED);
-                notifyChannel.sendMessage(eb.build()).queue();
-                notifyChannel.sendMessage("@here").complete().delete().queueAfter(5, TimeUnit.MINUTES);
+                notifyChannel.sendMessage(getStringOrDefault(config.getMentionID(), NeoConfigFile.getConfig().getMentionID())).embed(eb.build()).queue();
             }
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             ex.printStackTrace();
             System.exit(-1);
         }
     }
-
-
+    
+    /**
+     * @description Check if str is not null nor empty.
+     * @param str Input String
+     * @param defaultStr Default String
+     * @return Returns str if it's not null nor empty, otherwise returns defaultStr
+     */
+    private String getStringOrDefault(String str, String defaultStr)
+    {
+    	if (str == null || str.isEmpty())
+    		return defaultStr;
+    	return str;
+    }
 }

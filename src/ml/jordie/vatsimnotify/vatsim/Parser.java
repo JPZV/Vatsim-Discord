@@ -1,6 +1,6 @@
 package ml.jordie.vatsimnotify.vatsim;
 
-import ml.jordie.vatsimnotify.storage.ConfigFile;
+import ml.jordie.vatsimnotify.storage.NeoConfigFile;
 import ml.jordie.vatsimnotify.vatsim.model.Controller;
 
 import java.io.BufferedReader;
@@ -15,7 +15,7 @@ public class Parser {
      */
     public void parse() {
         try {
-            URL url = new URL(ConfigFile.getInstance().getProperty("VATSIM_DATA_SOURCE"));
+            URL url = new URL(NeoConfigFile.getConfig().getDataSource());
             BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
             ArrayList<String> lines = new ArrayList<>();
 
