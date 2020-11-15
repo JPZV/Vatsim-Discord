@@ -44,7 +44,7 @@ public class ControllerManager {
                 controllers.remove(cc);
                 controllers.add(controller);
             } else {
-                System.err.println("New Callsign: " + controller.getCallsign());
+                System.out.println("New Callsign: " + controller.getCallsign());
                 controllers.add(controller);
                 Bot.getInstance().newControllerAlert(controller, false);
             }
