@@ -43,25 +43,25 @@ The new configuration system works using JSON and it has more customization than
  **Sample config:**
 ```json
 {
-	"discord_token": "[YOUR BOT TOKEN]",
-	"channel_id": "775005707372199936",
-	"mention_id": "@here",
-	"closing_text": "%name% is closed %position%.",
-	"opening_text": "%name% is opening %position% (%frequency%)",
-	"zones": [
+    "discord_token": "[YOUR BOT TOKEN]",
+    "channel_id": "775005707372199936",
+    "mention_id": "@here",
+    "closing_text": "%name% is closed %position%.",
+    "opening_text": "%name% is opening %position% (%frequency%)",
+    "zones": [
         {
-			"mention_id": "<@&777603225347817503>",
-			"closing_text": "%name% está cerrando %position%.",
-			"opening_text": "%name% está abriendo %position% (%frequency%)",
-			"positions": ["SCEL", "SCEZ", "SAEZ", "BAIRES", "SAME"],
-			"notify_close": true
-		},
+            "mention_id": "<@&777603225347817503>",
+            "closing_text": "%name% está cerrando %position%.",
+            "opening_text": "%name% está abriendo %position% (%frequency%)",
+            "positions": ["SCEL", "SCEZ", "SAEZ", "BAIRES", "SAME"],
+            "notify_close": true
+        },
         {
-			"channel_id": "777595739215364146",
-			"notify_all": true,
-			"notify_close": true
-		}
-	]
+            "channel_id": "777595739215364146",
+            "notify_all": true,
+            "notify_close": true
+        }
+    ]
 }
 
 ```
