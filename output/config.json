@@ -1,31 +1,31 @@
 {
-	"discord_token": "[YOUR BOT TOKEN]",
-	"channel_id": "[YOUR CHANNEL ID]",
-	"mention_id": "[YOUR ROLE ID, OR @here OR @everyone]",
-	"closing_text": "[YOUR MESSAGE]",
-	"opening_text": "[YOUR MESSAGE]",
-	"zones": [
+    "discord_token": "[YOUR BOT TOKEN]",
+    "channel_id": "[YOUR CHANNEL ID]",
+    "mention_id": "[YOUR ROLE ID, OR @here OR @everyone]",
+    "closing_text": "[YOUR MESSAGE]",
+    "opening_text": "[YOUR MESSAGE]",
+    "zones": [
         {
             "channel_id": "[YOUR CHANNEL ID (optional)]",
             "mention_id": "[YOUR ROLE ID, OR @here OR @everyone (optional)]",
             "closing_text": "[YOUR MESSAGE (optional)]",
             "opening_text": "[YOUR MESSAGE (optional)]",
-			"positions": [ "YOUR ATC ID #1", "YOUR ATC ID #2", "YOUR ATC ID #3" ],
+            "positions": [ "YOUR ATC ID #1", "YOUR ATC ID #2", "YOUR ATC ID #3" ],
             "opening_positions": [ "YOUR ATC ID #4", "YOUR ATC ID #5", "YOUR ATC ID #6" ],
             "closing_positions": [ "YOUR ATC ID #7", "YOUR ATC ID #8", "YOUR ATC ID #9" ],
-			"notify_all": true,
-			"notify_close": true
-		},
+            "notify_all": true,
+            "notify_close": true
+        },
         {
             "channel_id": "[ANOTHER CHANNEL ID (optional)]",
             "mention_id": "[ANOTHER ROLE ID, OR @here OR @everyone (optional)]",
             "closing_text": "[ANOTHER MESSAGE (optional)]",
             "opening_text": "[ANOTHER MESSAGE (optional)]",
-			"positions": [ "ANOTHER ATC ID #1", "ANOTHER ATC ID #2", "ANOTHER ATC ID #3" ],
+            "positions": [ "ANOTHER ATC ID #1", "ANOTHER ATC ID #2", "ANOTHER ATC ID #3" ],
             "opening_positions": [ "ANOTHER ATC ID #4", "ANOTHER ATC ID #5", "ANOTHER ATC ID #6" ],
             "closing_positions": [ "ANOTHER ATC ID #7", "ANOTHER ATC ID #8", "ANOTHER ATC ID #9" ],
-			"notify_all": false,
-			"notify_close": false
-		}
-	]
+            "notify_all": false,
+            "notify_close": false
+        }
+    ]
 }
