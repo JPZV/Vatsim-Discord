@@ -24,6 +24,9 @@ public class NotifyConfig extends GenericConfig
 
     public Boolean getNotifyAll()
     {
+    	if(this._notifyAll == null)
+    		return false;
+    	
         return this._notifyAll;
     }
     public void setNotifyAll(Boolean value)
@@ -33,6 +36,9 @@ public class NotifyConfig extends GenericConfig
 
     public Boolean getNotifyClose()
     {
+    	if(this._notifyClose == null)
+    		return false;
+    	
         return this._notifyClose;
     }
     public void setNotifyClose(Boolean value)
