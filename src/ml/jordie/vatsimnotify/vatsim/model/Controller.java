@@ -30,6 +30,12 @@ public class Controller {
      * to be used across the program. Adding methods like controller.getFrequency() or controller.getOnlineTime()
      */
     public Controller(String dataString) {
+        if (dataString.length() < 50)
+            return;
+
+        if (dataString.contains(":PILOT:"))
+            return;
+        
         String[] cInfo = dataString.split(":");
         ArrayList<String> cArray = new ArrayList<>();
 
@@ -38,12 +44,6 @@ public class Controller {
                 cArray.add(s);
             }
         }
-
-        if (dataString.length() < 50)
-            return;
-
-        if (dataString.contains(":PILOT:"))
-            return;
 
         if (!cArray.get(3).equals("ATC"))
             return;
