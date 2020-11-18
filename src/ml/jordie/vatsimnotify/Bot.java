@@ -171,7 +171,11 @@ public class Bot {
                         .replace("%frequency%", c.getFrequency()));
                 eb.setFooter("VATSIM", api.getSelfUser().getEffectiveAvatarUrl());
                 eb.setColor(Color.GREEN);
-                notifyChannel.sendMessage(getStringOrDefault(config.getMentionID(), NeoConfigFile.getConfig().getMentionID())).embed(eb.build()).queue();
+                String mentionId = getStringOrDefault(config.getMentionID(), NeoConfigFile.getConfig().getMentionID());
+                if (mentionId != null && !mentionId.isEmpty())
+                	notifyChannel.sendMessage(mentionId).embed(eb.build()).queue();
+                else
+                	notifyChannel.sendMessage(eb.build()).queue();
             }
         }
         catch (Exception ex)
@@ -203,7 +207,11 @@ public class Bot {
                         .replace("%frequency%", c.getFrequency()));
                 eb.setFooter("VATSIM", api.getSelfUser().getEffectiveAvatarUrl());
                 eb.setColor(Color.RED);
-                notifyChannel.sendMessage(getStringOrDefault(config.getMentionID(), NeoConfigFile.getConfig().getMentionID())).embed(eb.build()).queue();
+                String mentionId = getStringOrDefault(config.getMentionID(), NeoConfigFile.getConfig().getMentionID());
+                if (mentionId != null && !mentionId.isEmpty())
+                	notifyChannel.sendMessage(mentionId).embed(eb.build()).queue();
+                else
+                	notifyChannel.sendMessage(eb.build()).queue();
             }
         }
         catch (Exception ex)
