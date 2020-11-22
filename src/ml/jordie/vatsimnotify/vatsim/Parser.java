@@ -20,7 +20,7 @@ public class Parser {
             ArrayList<String> lines = new ArrayList<>();
 
             String line = br.readLine();
-            while (!(line = br.readLine()).equalsIgnoreCase("!SERVERS:"))
+            while ((line = br.readLine()) != null && !line.equalsIgnoreCase("!SERVERS:"))
                 if (!line.startsWith(";") || !line.startsWith("!"))
                     lines.add(line);
 
