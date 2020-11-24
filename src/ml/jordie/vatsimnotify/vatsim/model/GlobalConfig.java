@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class GlobalConfig extends GenericConfig
 {
-	public static final String DEFAULT_DATA_SOURCE = "http://us.data.vatsim.net/vatsim-data.txt";
+	public static final String DEFAULT_DATA_SOURCE = "https://data.vatsim.net/vatsim-data.txt";
 	
 	@SerializedName("discord_token")
 	private String _discordToken;
