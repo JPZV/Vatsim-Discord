@@ -1,5 +1,6 @@
 package ml.jordie.vatsimnotify;
 
+import ml.jordie.vatsimnotify.logger.LogPrintStream;
 import ml.jordie.vatsimnotify.storage.NeoConfigFile;
 import ml.jordie.vatsimnotify.vatsim.model.NotifyConfig;
 import ml.jordie.vatsimnotify.vatsim.model.GlobalConfig;
@@ -29,6 +30,8 @@ public class Bot {
      * @param args
      */
     public static void main(String[] args) {
+    	System.setOut(new LogPrintStream(System.out));
+    	System.setErr(new LogPrintStream(System.err));
         new Bot().runBot();
     }
 
