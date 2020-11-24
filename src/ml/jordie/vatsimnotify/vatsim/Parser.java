@@ -5,6 +5,7 @@ import ml.jordie.vatsimnotify.vatsim.model.Controller;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -16,6 +17,15 @@ public class Parser {
     public void parse() {
         try {
             URL url = new URL(NeoConfigFile.getConfig().getDataSource());
+            HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+            int respCode = connection.getResponseCode();
+            //If the response code is NOT 2xx, then stop the parse immediately
+            if(respCode / 100 != 2)
+            {
+                System.err.println("WARNING: Couldn't download the data from Vatsim");
+                return;
+            }
+            
             BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
             ArrayList<String> lines = new ArrayList<>();
 
